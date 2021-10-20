@@ -1,0 +1,6 @@
+.vscode-server/
+.bash_history
+.vscode
+.config/
+.local/
+*.txt
