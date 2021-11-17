@@ -1,6 +1,9 @@
 package ar.edu.itba.graph.models;
 
-public class VertexProp {
+import java.io.Serializable;
+
+public class VertexProp implements Serializable {
+    
     private String URL;
     private String creator;
 
@@ -15,5 +18,10 @@ public class VertexProp {
 
     public String getCreator() {
         return creator;
+    }
+
+    @Override
+    public String toString() {
+        return "VertexProp [URL=" + URL + ", creator=" + creator + "]";
     }
 }

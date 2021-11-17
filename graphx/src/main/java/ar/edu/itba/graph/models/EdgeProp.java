@@ -1,8 +1,10 @@
 package ar.edu.itba.graph.models;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class EdgeProp {
+public class EdgeProp implements Serializable {
+    
     private String label;
     private Date date;
 
@@ -17,5 +19,10 @@ public class EdgeProp {
 
     public Date getDate() {
         return date;
+    }
+
+    @Override
+    public String toString() {
+        return "EdgeProp [date=" + date + ", label=" + label + "]";
     }
 }
