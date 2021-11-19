@@ -11,6 +11,7 @@ import com.tinkerpop.blueprints.Graph;
 
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.sql.Column;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SQLContext;
@@ -40,8 +41,8 @@ public class AirRoutesMain {
 
         final GraphFrame airRoutes = GraphFrame.apply(verticesDF, edgesDF);
 
-        printGraph(airRoutes);
-        // ej1(airRoutes);
+        // printGraph(airRoutes);
+        ej1(airRoutes);
 
         sparkContext.close();
     }
@@ -60,36 +61,36 @@ public class AirRoutesMain {
 
     private static void ej1(final GraphFrame airRoutes) {
         
+        System.out.println("EJ1");
+
         final Dataset<Row> oneStop = airRoutes
             .filterVertices("labelV = 'airport'")
             .filterEdges("labelE = 'route'")
             .find("(a)-[e]->(b); (b)-[e2]->(c)")
-            .filter("a.lat < 0 and a.lon < 0")
+            .filter(new Column("a.lat").isNotNull().and(new Column("a.lat").lt(Double.valueOf("0"))))
+            .filter(new Column("a.lon").isNotNull().and(new Column("a.lon").lt(Double.valueOf("0"))))
             .filter("c.code = 'SEA'")
             .filter("a.id != b.id and a.id != c.id and b.id != c.id")
             ;
-
+            
         final Dataset<Row> oneStopVertex = oneStop.select("a.code", "a.lat", "a.lon", "b.code", "c.code");
-
-        final Dataset<Row> direct = airRoutes
-            .filterVertices("labelV = 'airport'")
-            .filterEdges("labelE = 'route'")
-            .find("(a)-[e]->(b)")
-            .filter("a.lat < 0 and a.lon < 0")
-            .filter("b.code = 'SEA'")
-            .filter("a.id != b.id")
-            ;
-
-        final Dataset<Row> directVertex = direct.select("a.code", "a.lat", "a.lon", "b.code");
-
-        System.out.printf(
-            "OneStepVertex: %d. Direct: %d\n",
-            oneStopVertex.collectAsList().size(), 
-            directVertex.collectAsList().size()
-            );
+        oneStopVertex.show(1000);
+        oneStopVertex.printSchema();
         
-        directVertex.collectAsList().stream().forEach(row -> System.out.println(row.toString()));
-
-        oneStopVertex.collectAsList().stream().forEach(row -> System.out.println(row.toString()));
+        
+        final Dataset<Row> direct = airRoutes
+        .filterVertices("labelV = 'airport'")
+        .filterEdges("labelE = 'route'")
+        .find("(a)-[e]->(b)")
+        .filter(new Column("a.lat").isNotNull().and(new Column("a.lat").lt(Double.valueOf("0"))))
+        .filter(new Column("a.lon").isNotNull().and(new Column("a.lon").lt(Double.valueOf("0"))))
+        .filter("b.code = 'SEA'")
+        .filter("a.id != b.id")
+        ;
+        
+        final Dataset<Row> directVertex = direct.select("a.code", "a.lat", "a.lon", "b.code");
+        
+        directVertex.show(1000);
+        directVertex.printSchema();
     }
 }
