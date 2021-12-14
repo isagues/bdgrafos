@@ -1,6 +1,6 @@
 package ar.edu.itba.graph;
 
-import static ar.edu.itba.graph.GraphUtils.loadGraphML;
+import static ar.edu.itba.graph.utils.GraphUtils.loadGraphML;
 
 import java.io.IOException;
 import java.util.stream.StreamSupport;

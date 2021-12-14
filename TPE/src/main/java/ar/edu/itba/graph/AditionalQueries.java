@@ -1,13 +1,13 @@
 package ar.edu.itba.graph;
 
+
 import static ar.edu.itba.graph.utils.GraphUtils.loadEdges;
 import static ar.edu.itba.graph.utils.GraphUtils.loadGraphML;
 import static ar.edu.itba.graph.utils.GraphUtils.loadVertex;
 import static ar.edu.itba.graph.utils.GraphUtils.printDataset;
 
+
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import com.tinkerpop.blueprints.Graph;
@@ -27,13 +27,12 @@ import ar.edu.itba.graph.models.EdgeProperties;
 import ar.edu.itba.graph.models.VertexProperties;
 import ar.edu.itba.graph.utils.AnswerWriter;
 
-public class AirRoutesMain {
-
-
+public class AditionalQueries {
+    
     public static void main(String[] args) throws IOException {
         
         //
-        final SparkConf spark = new SparkConf().setAppName("TPE - isagues");
+        final SparkConf spark = new SparkConf().setAppName("TPE - isagues - AditionalQueries");
         final JavaSparkContext sparkContext = new JavaSparkContext(spark);
         final SparkSession session = SparkSession.builder().appName("TPE - isagues").getOrCreate();
         final SQLContext sqlContext = new org.apache.spark.sql.SQLContext(session);
@@ -53,17 +52,12 @@ public class AirRoutesMain {
         // AirRoutes
         final GraphFrame airRoutes = GraphFrame.apply(verticesDF, edgesDF);
 
-        // Ejecucion de ambos ejercicios
-        final Dataset<Row> ej1 = new Ej1(airRoutes).execute();
-        final Dataset<Row> ej2 = new Ej2(airRoutes).execute();
+        // Ejecucion de tests
+        final Dataset<Row> allAirports = new Ej1(airRoutes).allAirports();
+        final Dataset<Row> sumElevations = new Ej2(airRoutes).sumOfElevations();
 
-        printDataset(ej1);
-        printDataset(ej2);
-
-        final String timestamp = DateTimeFormatter.ofPattern("yyyy-MM-dd-HHmmss").format(LocalDateTime.now());
-
-        aw.writeAnswer(ej1, Ej1::resultToString, Ej1.HEADER, timestamp + "-b1.txt");
-        aw.writeAnswer(ej2, Ej2::resultToString, Ej2.HEADER, timestamp + "-b2.txt");
+        printDataset(allAirports);
+        printDataset(sumElevations);
 
         sparkContext.close();
     }

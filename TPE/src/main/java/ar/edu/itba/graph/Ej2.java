@@ -3,6 +3,7 @@ package ar.edu.itba.graph;
 import static org.apache.spark.sql.functions.col;
 import static org.apache.spark.sql.functions.collect_list;
 import static org.apache.spark.sql.functions.sort_array;
+import static org.apache.spark.sql.functions.sum;
 
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -22,6 +23,8 @@ public class Ej2 {
 
     public Dataset<Row> execute() {
         
+        System.out.println("Running EJ2");
+
         return airRoutes
             .filterEdges("labelE = 'contains'")
             .find("(c)-[]->(a); (p)-[]->(a)")
@@ -36,6 +39,30 @@ public class Ej2 {
                 )
             .groupBy(col("continent"), col("country"), col("countryDesc"))
             .agg(sort_array(collect_list(col("elev"))).alias("elevations"))
+            .sort(col("continent"), col("country"), col("countryDesc"))
+            ;
+    }
+
+    // Comparar si la suma realizada con graphFrames da lo mismo que sumar la coleccion de resultados, 
+    // revisamos que no se pierdan valores en la coleccion al agruparlos
+    public Dataset<Row> sumOfElevations() {
+        
+        System.out.println("Running EJ2");
+
+        return airRoutes
+            .filterEdges("labelE = 'contains'")
+            .find("(c)-[]->(a); (p)-[]->(a)")
+            .filter(col("a.labelV").eqNullSafe("airport"))
+            .filter(col("c.labelV").eqNullSafe("continent"))
+            .filter(col("p.labelV").eqNullSafe("country"))
+            .select(
+                col("c.desc").alias("continent")
+                , col("a.country").alias("country")
+                , col("p.desc").alias("countryDesc")
+                , col("a.elev").alias("elev")
+                )
+            .groupBy(col("continent"), col("country"), col("countryDesc"))
+            .agg(sum(col("elev"))).alias("elevations")
             .sort(col("continent"), col("country"), col("countryDesc"))
             ;
     }

@@ -1,10 +1,6 @@
-package ar.edu.itba.graph;
+package ar.edu.itba.graph.utils;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,10 +19,10 @@ import org.apache.hadoop.fs.Path;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.RowFactory;
+import org.graphframes.GraphFrame;
 
 import ar.edu.itba.graph.models.EdgeProperties;
 import ar.edu.itba.graph.models.VertexProperties;
-import avro.shaded.com.google.common.base.Function;
 
 public final class GraphUtils {
     
@@ -98,4 +94,21 @@ public final class GraphUtils {
 
 		return edges;
 	}
+
+    public static void printGraph(final GraphFrame graph){
+        
+        System.out.println("Vertices");
+        graph.vertices().printSchema();
+        graph.vertices().show();
+
+        System.out.println("Edges");
+        graph.edges().printSchema();
+        graph.edges().show();
+    }
+
+
+    public static void printDataset(final Dataset<Row> dataset) {
+        dataset.printSchema();
+        dataset.show(10_000);
+    }
 }

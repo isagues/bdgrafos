@@ -1,4 +1,4 @@
-package ar.edu.itba.graph;
+package ar.edu.itba.graph.utils;
 
 import java.io.BufferedWriter;
 import java.io.IOException;

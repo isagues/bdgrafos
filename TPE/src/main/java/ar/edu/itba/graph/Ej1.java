@@ -58,6 +58,34 @@ public class Ej1{
 
     }
 
+    // Probar que el filtro de lat y lon negativo no esten filtrando vuelos directos
+    public Dataset<Row> allAirports() {
+             
+        final int LIMIT = 10;
+
+        final Dataset<Row> oneStop = airRoutes
+            .filterVertices("labelV = 'airport'")
+            .filterEdges("labelE = 'route'")
+            .find("(a)-[e]->(b); (b)-[e2]->(c)")
+            .filter("c.code = 'SEA'")
+            .filter("a.id != b.id and a.id != c.id and b.id != c.id")
+            ;
+        
+
+        final Dataset<Row> direct = airRoutes
+            .filterVertices("labelV = 'airport'")
+            .filterEdges("labelE = 'route'")
+            .find("(a)-[e]->(b)")
+            .filter("b.code = 'SEA'")
+            .filter("a.id != b.id")
+            ;
+        
+        return oneStop.select(col("a.code"), col("a.lat"), col("a.lon"), array("a.code", "b.code", "c.code").alias("route")).limit(LIMIT)
+            .union(direct.select(col("a.code"), col("a.lat"), col("a.lon"), array("a.code", "b.code").alias("route")).limit(LIMIT))
+            ;
+
+    }
+
     public static String resultToString(final Row row) {
         return row.getAs("code").toString() + "\t" 
             + row.getAs("lat").toString() + "\t" 
